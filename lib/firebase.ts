@@ -1,5 +1,5 @@
 import { getApp, getApps, initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, Firestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -11,10 +11,17 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-if (!firebaseConfig.apiKey || !firebaseConfig.projectId || !firebaseConfig.appId) {
-  throw new Error('Firebase env vars missing. Please verify NEXT_PUBLIC_FIREBASE_* values in .env.local');
+const hasFirebaseConfig =
+  !!firebaseConfig.apiKey && !!firebaseConfig.projectId && !!firebaseConfig.appId;
+
+let db: Firestore | null = null;
+
+if (hasFirebaseConfig) {
+  const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+  db = getFirestore(app);
+} else if (typeof window !== 'undefined') {
+  // eslint-disable-next-line no-console
+  console.warn('Firebase env vars are missing. Firestore features are disabled until NEXT_PUBLIC_FIREBASE_* are set.');
 }
 
-const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-
-export const db = getFirestore(app);
+export { db, hasFirebaseConfig };
