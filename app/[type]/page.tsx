@@ -14,9 +14,16 @@ export default function TypeListPage({ params }: { params: { type: string } }) {
   const type = normalizeType(params.type);
 
   useEffect(() => {
+    if (params.type === 'past-events') {
+      Promise.all([getItems<Trip>('trips'), getItems<Event>('events')]).then(([trips, events]) => {
+        setItems([...(trips as ItemRecord[]), ...(events as ItemRecord[])]);
+      });
+      return;
+    }
+
     if (!type) return;
     getItems<ItemRecord>(type).then(setItems);
-  }, [type]);
+  }, [params.type, type]);
 
   const data = useMemo(() => {
     if (params.type !== 'past-events') return items;
@@ -44,9 +51,18 @@ export default function TypeListPage({ params }: { params: { type: string } }) {
         {data.map((item) => (
           <ItemCard
             key={item.id}
-            type={type ?? 'events'}
+            type={params.type === 'past-events' ? ('toDate' in item ? 'trips' : 'events') : (type ?? 'events')}
             item={item}
-            onRefresh={() => getItems<ItemRecord>(type ?? 'events').then(setItems)}
+            onRefresh={() => {
+              if (params.type === 'past-events') {
+                Promise.all([getItems<Trip>('trips'), getItems<Event>('events')]).then(([trips, events]) => {
+                  setItems([...(trips as ItemRecord[]), ...(events as ItemRecord[])]);
+                });
+                return;
+              }
+
+              getItems<ItemRecord>(type ?? 'events').then(setItems);
+            }}
           />
         ))}
         {data.length === 0 && <div className="glass-panel p-4 text-sm text-zinc-500">Nothing here yet.</div>}

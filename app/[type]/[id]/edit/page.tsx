@@ -32,6 +32,7 @@ export default function EditPage({ params }: { params: { type: string; id: strin
           onSubmit={async (payload) => {
             await updateItem(type, params.id, payload);
             router.push(`/${type}`);
+            router.refresh();
           }}
         />
       </div>
