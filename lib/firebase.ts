@@ -11,6 +11,10 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
+if (!firebaseConfig.apiKey || !firebaseConfig.projectId || !firebaseConfig.appId) {
+  throw new Error('Firebase env vars missing. Please verify NEXT_PUBLIC_FIREBASE_* values in .env.local');
+}
+
 const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
 export const db = getFirestore(app);

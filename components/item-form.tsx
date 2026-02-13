@@ -1,13 +1,10 @@
 'use client';
 
-import { useMemo, useRef, useState } from 'react';
-import { Clock3 } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { ParticipantTags } from '@/components/participant-tags';
 import { CollectionType } from '@/types/models';
 
 export type FormData = Record<string, string | boolean | string[]>;
-
-type TimeInput = HTMLInputElement & { showPicker?: () => void };
 
 const labelMap: Record<string, string> = {
   fromDate: 'From date',
@@ -18,6 +15,12 @@ const labelMap: Record<string, string> = {
   location: 'Location',
   memo: 'Memo',
 };
+
+const timeOptions = Array.from({ length: 48 }, (_, index) => {
+  const hour = String(Math.floor(index / 2)).padStart(2, '0');
+  const minute = index % 2 === 0 ? '00' : '30';
+  return `${hour}:${minute}`;
+});
 
 export function ItemForm({
   type,
@@ -43,8 +46,6 @@ export function ItemForm({
   );
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const fromTimeRef = useRef<TimeInput>(null);
-  const toTimeRef = useRef<TimeInput>(null);
 
   const fields = useMemo(() => {
     if (type === 'trips') return ['fromDate', 'toDate', 'location', 'memo'];
@@ -61,11 +62,6 @@ export function ItemForm({
       return 'Event end time must be after start time.';
     }
     return '';
-  };
-
-  const openTimePicker = (ref: React.RefObject<TimeInput | null>) => {
-    if (ref.current?.showPicker) ref.current.showPicker();
-    ref.current?.focus();
   };
 
   return (
@@ -93,30 +89,30 @@ export function ItemForm({
         return (
           <label key={field} className="flex flex-col gap-1 text-sm font-semibold text-zinc-700">
             {labelMap[field] ?? field}
-
-            <div className="relative">
-              <input
-                ref={field === 'fromTime' ? fromTimeRef : field === 'toTime' ? toTimeRef : undefined}
+            {isTime ? (
+              <select
                 required={field !== 'toTime'}
-                type={field.includes('date') ? 'date' : isTime ? 'time' : 'text'}
-                step={isTime ? 300 : undefined}
-                className="w-full rounded-xl border border-pink-200 bg-white px-3 py-2 pr-10 outline-none ring-pink-200 transition focus:ring"
+                className="w-full rounded-xl border border-pink-200 bg-white px-3 py-2 outline-none ring-pink-200 transition focus:ring"
+                value={String(form[field] ?? '')}
+                onChange={(event) => setForm({ ...form, [field]: event.target.value })}
+              >
+                <option value="">Select time</option>
+                {timeOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                required={field !== 'toTime'}
+                type={field.includes('date') ? 'date' : 'text'}
+                className="w-full rounded-xl border border-pink-200 bg-white px-3 py-2 outline-none ring-pink-200 transition focus:ring"
                 value={String(form[field] ?? '')}
                 onChange={(event) => setForm({ ...form, [field]: event.target.value })}
                 placeholder={field === 'memo' ? 'Write a sweet note...' : ''}
               />
-
-              {isTime && (
-                <button
-                  type="button"
-                  aria-label={`Open ${field} picker`}
-                  onClick={() => openTimePicker(field === 'fromTime' ? fromTimeRef : toTimeRef)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-pink-600 hover:bg-pink-100"
-                >
-                  <Clock3 size={16} />
-                </button>
-              )}
-            </div>
+            )}
           </label>
         );
       })}

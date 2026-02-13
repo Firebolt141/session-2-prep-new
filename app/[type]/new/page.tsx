@@ -19,7 +19,7 @@ export default function NewItemPage({ params }: { params: { type: string } }) {
           type={type}
           onSubmit={async (payload) => {
             await createItem(type, payload);
-            router.push(`/${type}`);
+            router.push('/home');
             router.refresh();
           }}
         />

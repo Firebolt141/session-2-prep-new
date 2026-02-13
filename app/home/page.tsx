@@ -4,11 +4,11 @@ import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/style.css';
 import Link from 'next/link';
-import { CalendarPlus, ChevronDown, Heart, Plane, SquareCheckBig } from 'lucide-react';
+import { CalendarPlus, ChevronDown, Heart, LogOut, Plane, SquareCheckBig } from 'lucide-react';
 import { fetchNishiWasedaWeather, weatherEmoji } from '@/lib/weather';
 import { subscribeItems } from '@/lib/firestore';
 import { Event, Todo, Trip, Wishlist, CollectionType } from '@/types/models';
-import { isDateMatch } from '@/lib/date-utils';
+import { isDateInTripRange, isDateMatch } from '@/lib/date-utils';
 import { ItemCard } from '@/components/cards';
 import { HamburgerMenu } from '@/components/menu';
 
@@ -46,7 +46,7 @@ export default function HomePage() {
 
   const filtered = useMemo(
     () => ({
-      trips: trips.filter((trip) => isDateMatch(trip.fromDate, selected) || isDateMatch(trip.toDate, selected)),
+      trips: trips.filter((trip) => isDateInTripRange(trip, selected)),
       events: events.filter((event) => isDateMatch(event.date, selected)),
       todos: todos.filter((todo) => isDateMatch(todo.date, selected)),
       wishlist,
@@ -65,7 +65,7 @@ export default function HomePage() {
 
       <section className="glass-panel p-4">
         <div className="mb-3 flex items-center justify-between">
-          <p className="text-sm font-semibold text-pink-600">Pick a date</p>
+          <p className="text-sm font-semibold text-pink-600">You&apos;re doing amazing — pick a date and make it special ✨</p>
           <button
             className="subtle-button"
             onClick={() => {
@@ -79,7 +79,7 @@ export default function HomePage() {
           </button>
         </div>
 
-        <div className="overflow-x-auto rounded-2xl border border-pink-100 bg-white p-2 shadow-inner">
+        <div className="overflow-x-auto rounded-2xl border border-pink-100 bg-gradient-to-b from-white to-pink-50 p-2 shadow-inner">
           <DayPicker
             mode="single"
             selected={selected}
@@ -112,7 +112,7 @@ export default function HomePage() {
         )}
       </div>
 
-      <section className="space-y-5 pb-10">
+      <section className="space-y-5 pb-2">
         {(['trips', 'events', 'todos', 'wishlist'] as const).map((type) => (
           <div key={type}>
             <div className="mb-2 flex items-center justify-between">
@@ -134,6 +134,12 @@ export default function HomePage() {
           </div>
         ))}
       </section>
+
+      <footer className="pb-8 pt-2">
+        <Link href="/" className="subtle-button flex w-full items-center justify-center gap-2">
+          <LogOut size={15} /> Logout
+        </Link>
+      </footer>
     </main>
   );
 }
