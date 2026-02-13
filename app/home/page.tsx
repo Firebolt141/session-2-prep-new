@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/style.css';
 import Link from 'next/link';
+import { Plus } from 'lucide-react';
 import { fetchNishiWasedaWeather, weatherEmoji } from '@/lib/weather';
 import { subscribeItems } from '@/lib/firestore';
 import { Event, Todo, Trip, Wishlist } from '@/types/models';
@@ -46,19 +47,19 @@ export default function HomePage() {
   );
 
   return (
-    <main className="min-h-screen bg-pink-50 p-4 text-zinc-800">
-      <header className="mb-4 flex items-center justify-between">
+    <main className="mx-auto min-h-screen w-full max-w-xl space-y-4 p-4">
+      <header className="flex items-center justify-between gap-2">
         <HamburgerMenu open={menuOpen} onToggle={() => setMenuOpen((prev) => !prev)} />
-        <div className="rounded-full bg-white px-4 py-2 text-sm shadow">
-          {weather ? `${weatherEmoji(weather.weatherCode)} ${weather.temperature}°C` : 'Tokyo weather...'}
+        <div className="glass-panel px-4 py-2 text-sm font-medium">
+          {weather ? `${weatherEmoji(weather.weatherCode)} ${weather.temperature}°C · Nishi-Waseda` : 'Loading weather...'}
         </div>
       </header>
 
-      <section className="rounded-3xl bg-white p-4 shadow-sm ring-1 ring-pink-100">
-        <div className="mb-2 flex items-center justify-between">
-          <h2 className="font-semibold text-pink-900">Calendar</h2>
+      <section className="glass-panel p-4">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-lg font-bold text-zinc-800">Your Calendar</h2>
           <button
-            className="rounded-xl bg-pink-100 px-3 py-1 text-sm text-pink-700"
+            className="subtle-button"
             onClick={() => {
               const now = new Date();
               setMonth(now);
@@ -69,29 +70,42 @@ export default function HomePage() {
             Today
           </button>
         </div>
-        <div className="overflow-x-auto">
-          <DayPicker mode="single" selected={selected} onSelect={(day) => day && setSelected(day)} month={month} onMonthChange={setMonth} />
+
+        <div className="overflow-x-auto rounded-2xl bg-white/70 p-2">
+          <DayPicker
+            mode="single"
+            selected={selected}
+            onSelect={(day) => day && setSelected(day)}
+            month={month}
+            onMonthChange={setMonth}
+          />
         </div>
       </section>
 
-      <div className="mt-4 flex justify-end">
-        <Link href="/events/new" className="rounded-xl bg-pink-500 px-4 py-2 text-sm font-semibold text-white">
-          + Add item
+      <div className="flex justify-end">
+        <Link href="/events/new" className="cute-button inline-flex items-center gap-2">
+          <Plus size={16} /> Add item
         </Link>
       </div>
 
-      <section className="mt-4 space-y-4">
+      <section className="space-y-5 pb-10">
         {(['trips', 'events', 'todos', 'wishlist'] as const).map((type) => (
           <div key={type}>
             <div className="mb-2 flex items-center justify-between">
-              <h3 className="font-semibold capitalize text-pink-900">{type}</h3>
-              <Link href={`/${type}`} className="text-xs text-blue-500">See all</Link>
+              <h3 className="text-base font-bold capitalize text-zinc-800">{type}</h3>
+              <Link href={`/${type}`} className="text-xs font-medium text-pink-600 hover:underline">
+                See all
+              </Link>
             </div>
             <div className="space-y-3">
               {filtered[type].map((item) => (
                 <ItemCard key={item.id} type={type} item={item} onRefresh={() => undefined} />
               ))}
-              {filtered[type].length === 0 && <p className="text-sm text-zinc-500">No items yet.</p>}
+              {filtered[type].length === 0 && (
+                <div className="rounded-2xl border border-dashed border-pink-200 bg-white/50 p-4 text-sm text-zinc-500">
+                  No {type} for this day yet.
+                </div>
+              )}
             </div>
           </div>
         ))}

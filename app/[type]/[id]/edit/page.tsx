@@ -13,7 +13,7 @@ export default function EditPage({ params }: { params: { type: string; id: strin
 
   useEffect(() => {
     if (!type) return;
-    getItems<(FormData & { id: string })>(type).then((items) => {
+    getItems<FormData & { id: string }>(type).then((items) => {
       const found = items.find((entry) => entry.id === params.id) ?? null;
       setItem(found);
     });
@@ -23,9 +23,9 @@ export default function EditPage({ params }: { params: { type: string; id: strin
   if (!item) return <p className="p-4">Loading...</p>;
 
   return (
-    <main className="min-h-screen bg-pink-50 p-4">
-      <h1 className="mb-4 text-2xl font-bold capitalize text-pink-900">Edit {type.slice(0, -1)}</h1>
-      <div className="rounded-2xl bg-white p-4 shadow">
+    <main className="mx-auto min-h-screen w-full max-w-xl p-4">
+      <h1 className="mb-4 text-2xl font-extrabold capitalize text-zinc-800">Edit {type.slice(0, -1)}</h1>
+      <div className="glass-panel p-4">
         <ItemForm
           type={type}
           initial={item}

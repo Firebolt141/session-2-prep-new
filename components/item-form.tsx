@@ -6,6 +6,16 @@ import { CollectionType } from '@/types/models';
 
 export type FormData = Record<string, string | boolean | string[]>;
 
+const labelMap: Record<string, string> = {
+  fromDate: 'From date',
+  toDate: 'To date',
+  date: 'Date',
+  fromTime: 'From time',
+  toTime: 'To time (optional)',
+  location: 'Location',
+  memo: 'Memo',
+};
+
 export function ItemForm({
   type,
   initial,
@@ -53,32 +63,32 @@ export function ItemForm({
       onSubmit={async (event) => {
         event.preventDefault();
         const message = validate();
-        if (message) {
-          setError(message);
-          return;
-        }
+        if (message) return setError(message);
         setError('');
         await onSubmit(form);
       }}
     >
       {fields.map((field) => (
-        <label key={field} className="flex flex-col gap-1 text-sm font-semibold text-pink-900">
-          {field}
+        <label key={field} className="flex flex-col gap-1 text-sm font-semibold text-zinc-700">
+          {labelMap[field] ?? field}
           <input
             required={field !== 'toTime'}
-            type={field.toLowerCase().includes('date') ? 'date' : field.toLowerCase().includes('time') ? 'time' : 'text'}
-            className="rounded-xl border border-pink-100 px-3 py-2"
+            type={field.includes('date') ? 'date' : field.includes('time') ? 'time' : 'text'}
+            className="rounded-xl border border-pink-200 bg-white px-3 py-2 outline-none ring-pink-200 transition focus:ring"
             value={String(form[field] ?? '')}
             onChange={(event) => setForm({ ...form, [field]: event.target.value })}
+            placeholder={field === 'memo' ? 'Write a sweet note...' : ''}
           />
         </label>
       ))}
+
       <ParticipantTags
         value={(form.participants as string[]) ?? []}
         onChange={(participants) => setForm({ ...form, participants })}
       />
-      {error && <p className="text-sm text-rose-500">{error}</p>}
-      <button className="w-full rounded-xl bg-pink-500 py-3 font-semibold text-white">Save</button>
+
+      {error && <p className="rounded-xl bg-rose-50 p-2 text-sm text-rose-600">{error}</p>}
+      <button className="cute-button w-full py-3">Save</button>
     </form>
   );
 }

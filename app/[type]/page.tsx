@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { isBefore, parseISO, startOfDay } from 'date-fns';
+import { Plus } from 'lucide-react';
 import { ItemCard } from '@/components/cards';
 import { getItems } from '@/lib/firestore';
 import { normalizeType } from '@/lib/type-config';
@@ -30,14 +31,16 @@ export default function TypeListPage({ params }: { params: { type: string } }) {
   const collectionForNew: CollectionType = type ?? 'events';
 
   return (
-    <main className="min-h-screen bg-pink-50 p-4">
+    <main className="mx-auto min-h-screen w-full max-w-xl p-4">
       <header className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold capitalize text-pink-900">{params.type.replace('-', ' ')}</h1>
+        <h1 className="text-2xl font-extrabold capitalize text-zinc-800">{params.type.replace('-', ' ')}</h1>
         {params.type !== 'past-events' && (
-          <Link href={`/${collectionForNew}/new`} className="rounded-xl bg-pink-500 px-4 py-2 text-white">Add</Link>
+          <Link href={`/${collectionForNew}/new`} className="cute-button inline-flex items-center gap-2">
+            <Plus size={16} /> Add
+          </Link>
         )}
       </header>
-      <section className="space-y-3">
+      <section className="space-y-3 pb-10">
         {data.map((item) => (
           <ItemCard
             key={item.id}
@@ -46,7 +49,7 @@ export default function TypeListPage({ params }: { params: { type: string } }) {
             onRefresh={() => getItems<ItemRecord>(type ?? 'events').then(setItems)}
           />
         ))}
-        {data.length === 0 && <p className="text-sm text-zinc-500">Nothing here yet.</p>}
+        {data.length === 0 && <div className="glass-panel p-4 text-sm text-zinc-500">Nothing here yet.</div>}
       </section>
     </main>
   );

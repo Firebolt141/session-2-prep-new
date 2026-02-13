@@ -12,9 +12,9 @@ export default function NewItemPage({ params }: { params: { type: string } }) {
   if (!type) return <p className="p-4">Unknown type.</p>;
 
   return (
-    <main className="min-h-screen bg-pink-50 p-4">
-      <h1 className="mb-4 text-2xl font-bold capitalize text-pink-900">New {type.slice(0, -1)}</h1>
-      <div className="rounded-2xl bg-white p-4 shadow">
+    <main className="mx-auto min-h-screen w-full max-w-xl p-4">
+      <h1 className="mb-4 text-2xl font-extrabold capitalize text-zinc-800">New {type.slice(0, -1)}</h1>
+      <div className="glass-panel p-4">
         <ItemForm
           type={type}
           onSubmit={async (payload) => {
